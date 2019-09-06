@@ -43,6 +43,16 @@ export class ScmMainImpl implements ScmMain {
         this.scmService = container.get(ScmService);
         this.scmRepositoryMap = new Map();
         this.labelProvider = container.get(LabelProvider);
+        this.scmService.onDidChangeSelectedRepository(repository => {
+            if (!repository) {
+                return;
+            }
+            this.scmRepositoryMap.forEach((value, key) => {
+                if (value.provider.rootUri === repository.provider.rootUri) {
+                    this.proxy.$setSelectedSourceControl(key);
+                }
+            });
+        });
     }
 
     async $registerSourceControl(sourceControlHandle: number, id: string, label: string, rootUri: string): Promise<void> {
